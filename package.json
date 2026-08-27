@@ -1,0 +1,16 @@
+{
+  "name": "nexura-commerce-platform",
+  "version": "1.0.0",
+  "description": "Nexura - Flagship Full-Stack E-Commerce Platform with React and Node.js Microservices",
+  "scripts": {
+    "init:db": "node database/init_db.js",
+    "start:user-service": "cd user-product-service && npm start",
+    "start:order-service": "cd order-cart-service && npm start",
+    "start:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd user-product-service && npm install && cd ../order-cart-service && npm install && cd ../frontend && npm install",
+    "start": "concurrently \"npm run start:user-service\" \"npm run start:order-service\" \"npm run start:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
