@@ -2,6 +2,14 @@
 node_modules/
 */node_modules/
 
+# Maven & Java Build Output
+target/
+*/target/
+*.class
+*.jar
+*.war
+apache-maven-*/
+
 # Environment Variables
 .env
 .env.local
@@ -16,6 +24,7 @@ build/
 # SQLite storage files
 database/*.sqlite
 *.sqlite
+*.db
 
 # Logs
 logs
@@ -27,5 +36,6 @@ yarn-error.log*
 # Editor & OS files
 .vscode/
 .idea/
+*.iml
 .DS_Store
 Thumbs.db

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexura - Full-Stack Microservices Platform Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    @page {
+      size: A4;
+      margin: 12mm 12mm 12mm 12mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      line-height: 1.5;
+      font-size: 9pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page {
+      padding: 10px 5px;
+      page-break-after: always;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Cover Page */
+    .brand-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      color: #ffffff;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 8pt;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .cover-title {
+      font-size: 26pt;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.15;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .cover-subtitle {
+      font-size: 11.5pt;
+      font-weight: 400;
+      color: #475569;
+      margin-bottom: 18px;
+      max-width: 650px;
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      margin: 14px 0 20px 0;
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .spec-label {
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #64748b;
+      letter-spacing: 0.5px;
+    }
+
+    .spec-value {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #0f172a;
+      margin-top: 1px;
+    }
+
+    /* Section Styles */
+    h1 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #0f172a;
+      border-bottom: 2px solid #0ea5e9;
+      padding-bottom: 4px;
+      margin-top: 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    h2 {
+      font-size: 11.5pt;
+      font-weight: 600;
+      color: #1e293b;
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    h3 {
+      font-size: 10pt;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    p {
+      margin-bottom: 8px;
+      color: #334155;
+      font-size: 8.8pt;
+    }
+
+    ul, ol {
+      margin-left: 18px;
+      margin-bottom: 8px;
+    }
+
+    li {
+      margin-bottom: 3px;
+      font-size: 8.8pt;
+      color: #334155;
+    }
+
+    /* Diagrams & Code */
+    .ascii-diagram {
+      background: #0f172a;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7.2pt;
+      padding: 12px;
+      border-radius: 8px;
+      white-space: pre;
+      line-height: 1.3;
+      margin: 10px 0;
+      overflow-x: auto;
+      border: 1px solid #1e293b;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 8pt;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 8.2pt;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 600;
+      text-align: left;
+      padding: 6px 10px;
+      border-bottom: 1px solid #cbd5e1;
+      font-size: 8pt;
+    }
+
+    td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Cards & Boxes */
+    .info-box {
+      background: #f0f9ff;
+      border-left: 3px solid #0284c7;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      margin: 8px 0;
+    }
+
+    .info-box p {
+      color: #0369a1;
+      margin: 0;
+      font-size: 8.3pt;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .feature-card {
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .feature-card h4 {
+      font-size: 9.2pt;
+      color: #0f172a;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .feature-card p {
+      font-size: 8pt;
+      color: #64748b;
+      margin: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 7pt;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-get { background: #dcfce7; color: #166534; }
+    .badge-post { background: #dbeafe; color: #1e40af; }
+    .badge-put { background: #fef3c7; color: #92400e; }
+    .badge-delete { background: #fee2e2; color: #991b1b; }
+
+    .footer-bar {
+      font-size: 7.5pt;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 8px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: OVERVIEW & TOPOLOGY -->
+  <div class="page">
+    <div class="brand-badge">Nexura Architecture Specification</div>
+    <div class="cover-title">Nexura E-Commerce Platform</div>
+    <div class="cover-subtitle">Complete Microservices Architecture, API Contract & System Engineering Guide</div>
+
+    <div class="spec-grid">
+      <div class="spec-item">
+        <span class="spec-label">System Architecture</span>
+        <span class="spec-value">Decoupled Microservices</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Frontend Framework</span>
+        <span class="spec-value">React 18 + Vite SPA</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Backend Microservices</span>
+        <span class="spec-value">Node.js + Express REST APIs</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Persistence Layer</span>
+        <span class="spec-value">MySQL 8.0 / SQLite Zero-Config</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">Authentication System</span>
+        <span class="spec-value">JWT + Role-Based Guards</span>
+      </div>
+      <div class="spec-item">
+        <span class="spec-label">State Management</span>
+        <span class="spec-value">React Context API + Custom Hooks</span>
+      </div>
+    </div>
+
+    <h1>1. Executive Summary & Core Objectives</h1>
+    <p>
+      <strong>Nexura</strong> is a production-grade full-stack e-commerce solution architected around domain-driven, decoupled microservices. Designed with an Apple-inspired neo-minimalist aesthetic, the system provides high throughput, fault tolerance, strict domain isolation, and real-time inventory management.
+    </p>
+
+    <div class="card-grid">
+      <div class="feature-card">
+        <h4>🏢 Strict Domain Isolation</h4>
+        <p>Independent services for user/catalog and orders/cart with separate persistent databases.</p>
+      </div>
+      <div class="feature-card">
+        <h4>⚡ Synchronous Inter-Service REST</h4>
+        <p>Automated stock validation and atomic decrement upon checkout completion.</p>
+      </div>
+      <div class="feature-card">
+        <h4>🔒 Enterprise JWT Security</h4>
+        <p>Role-based authorization (Admin / Customer) with automatic interceptor token refresh.</p>
+      </div>
+      <div class="feature-card">
+        <h4>📦 Hybrid Storage Engine</h4>
+        <p>Dual MySQL production schemas with automatic, zero-config SQLite persistence fallback.</p>
+      </div>
+    </div>
+
+    <h1>2. System Topology & Architecture</h1>
+    <div class="ascii-diagram">
++--------------------------------------------------------------------------+
+|                        NEXURA CLIENT (React 18 + Vite)                   |
+|                        Runs on: http://localhost:5173                    |
++--------------------+--------------------------------+--------------------+
+                     |                                |
+   Axios REST /api/auth, /api/products,      Axios REST /api/cart,
+   /api/categories, /api/users, /api/stats    /api/orders
+                     |                                |
+                     v                                v
++---------------------------------------+  +-------------------------------+
+|  MICROSERVICE 1: User & Product       |  |  MICROSERVICE 2: Order & Cart |
+|  Port: 5001                           |  |  Port: 5002                   |
+|  - Auth & Profile Management          |  |  - Persistent Cart & Coupons  |
+|  - Category & Product Catalog         |  |  - Checkout & Order Lifecycle |
+|  - Stock Management (/reduce-stock)   |<----+ Inter-Service REST Calls   |
++--------------------+------------------+  |    (Price / Stock Check)      |
+                     |                     +---------------+---------------+
+                     v                                     v
++---------------------------------------+  +-------------------------------+
+|  DATABASE 1: ecommerce_users_products |  |  DATABASE 2: ecommerce_orders |
+|  (MySQL 8.0 / SQLite Fallback)        |  |  (MySQL 8.0 / SQLite Fallback)|
++---------------------------------------+  +-------------------------------+
+    </div>
+
+    <div class="footer-bar">
+      <span>Nexura Technical Specification • Document Version 1.0</span>
+      <span>Page 1 of 4</span>
+    </div>
+  </div>
+
+  <!-- PAGE 2: USER & PRODUCT SERVICE -->
+  <div class="page">
+    <h1>3. Microservice 1: User & Product Service</h1>
+    <p><strong>Port:</strong> <code>5001</code> | <strong>Database:</strong> <code>ecommerce_users_products</code></p>
+    <p>
+      This service is the authoritative source for customer profiles, authentication tokens, product taxonomy, and catalog inventory levels.
+    </p>
+
+    <h3>Database Models & Schemas</h3>
+    <ul>
+      <li><strong>User:</strong> <code>id</code>, <code>name</code>, <code>email</code>, <code>password</code> (bcrypt hashed), <code>role</code> (<code>admin</code> / <code>customer</code>), <code>phone</code>, <code>avatar</code>, timestamps.</li>
+      <li><strong>Category:</strong> <code>id</code>, <code>name</code>, <code>slug</code>, <code>description</code>, <code>image</code>.</li>
+      <li><strong>Product:</strong> <code>id</code>, <code>name</code>, <code>slug</code>, <code>description</code>, <code>price</code>, <code>discount_price</code>, <code>image</code>, <code>category</code>, <code>category_id</code>, <code>stock</code>, <code>rating</code>, <code>num_reviews</code>, <code>is_featured</code>.</li>
+    </ul>
+
+    <h3>REST Endpoints Reference</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 10%;">Method</th>
+          <th style="width: 25%;">Route</th>
+          <th style="width: 15%;">Access</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-post">POST</span></td>
+          <td><code>/api/auth/register</code></td>
+          <td>Public</td>
+          <td>Creates a new customer account and issues JWT.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-post">POST</span></td>
+          <td><code>/api/auth/login</code></td>
+          <td>Public</td>
+          <td>Authenticates email/password; returns JWT and user payload.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-get">GET</span></td>
+          <td><code>/api/auth/me</code></td>
+          <td>Authenticated</td>
+          <td>Returns profile of current authenticated user.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-get">GET</span></td>
+          <td><code>/api/products</code></td>
+          <td>Public</td>
+          <td>Lists products with filters (category, min/max price, sort, search).</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-get">GET</span></td>
+          <td><code>/api/products/:id</code></td>
+          <td>Public</td>
+          <td>Fetches individual product specifications and stock.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-post">POST</span></td>
+          <td><code>/api/products/reduce-stock</code></td>
+          <td>Internal / Auth</td>
+          <td>Inter-service endpoint to deduct stock upon order placement.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-post">POST</span></td>
+          <td><code>/api/products</code></td>
+          <td>Admin</td>
+          <td>Creates a new product item in catalog.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-put">PUT</span></td>
+          <td><code>/api/products/:id</code></td>
+          <td>Admin</td>
+          <td>Updates existing product properties and stock.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-delete">DELETE</span></td>
+          <td><code>/api/products/:id</code></td>
+          <td>Admin</td>
+          <td>Deletes product from catalog.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-get">GET</span></td>
+          <td><code>/api/stats/dashboard</code></td>
+          <td>Admin</td>
+          <td>Aggregates catalog volume, user counts, and inventory health.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer-bar">
+      <span>Nexura Technical Specification • User & Product Service</span>
+      <span>Page 2 of 4</span>
+    </div>
+  </div>
+
+  <!-- PAGE 3: ORDER & CART SERVICE -->
+  <div class="page">
+    <h1>4. Microservice 2: Order & Cart Service</h1>
+    <p><strong>Port:</strong> <code>5002</code> | <strong>Database:</strong> <code>ecommerce_orders</code></p>
+    <p>
+      This microservice manages user shopping carts, promo voucher evaluation, checkout orchestration, invoice generation, and status tracking.
+    </p>
+
+    <h3>Inter-Service Communication Flow</h3>
+    <div class="info-box">
+      <p>
+        When an order is created, <code>Order & Cart Service</code> executes synchronous HTTP requests to <code>http://localhost:5001/api/products/:id</code> to confirm product availability and unit prices. Upon successful checkout, it calls <code>/api/products/reduce-stock</code> to automatically decrement inventory in Microservice 1.
+      </p>
+    </div>
+
+    <h3>REST Endpoints Reference</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 10%;">Method</th>
+          <th style="width: 25%;">Route</th>
+          <th style="width: 15%;">Access</th>
+          <th style="width: 50%;">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-get">GET</span></td>
+          <td><code>/api/cart</code></td>
+          <td>Authenticated</td>
+          <td>Fetches active user cart with populated item details.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-post">POST</span></td>
+          <td><code>/api/cart/add</code></td>
+          <td>Authenticated</td>
+          <td>Adds item or increments quantity in user's cart.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-put">PUT</span></td>
+          <td><code>/api/cart/items/:id</code></td>
+          <td>Authenticated</td>
+          <td>Modifies item quantity (1 to Max Stock).</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-delete">DELETE</span></td>
+          <td><code>/api/cart/items/:id</code></td>
+          <td>Authenticated</td>
+          <td>Removes line item from cart.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-post">POST</span></td>
+          <td><code>/api/orders</code></td>
+          <td>Authenticated</td>
+          <td>Places order, decrements stock, records transaction invoice.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-get">GET</span></td>
+          <td><code>/api/orders/my-orders</code></td>
+          <td>Authenticated</td>
+          <td>Retrieves order history for current logged-in user.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-get">GET</span></td>
+          <td><code>/api/orders/:id</code></td>
+          <td>Authenticated</td>
+          <td>Detailed order view including items, delivery, and timeline.</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-put">PUT</span></td>
+          <td><code>/api/orders/:id/status</code></td>
+          <td>Admin</td>
+          <td>Updates order status (Confirmed ➔ Processing ➔ Shipped ➔ Delivered).</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer-bar">
+      <span>Nexura Technical Specification • Order & Cart Service</span>
+      <span>Page 3 of 4</span>
+    </div>
+  </div>
+
+  <!-- PAGE 4: FRONTEND, DEMO & OPERATIONS -->
+  <div class="page">
+    <h1>5. Frontend Architecture & Design System</h1>
+    <p>
+      The client interface is built with <strong>React 18</strong> and <strong>Vite</strong>, following a modular component architecture without heavy CSS framework bloat.
+    </p>
+
+    <h3>Application Page Hierarchy</h3>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 20%;">Page</th>
+          <th style="width: 15%;">Route</th>
+          <th style="width: 15%;">Audience</th>
+          <th style="width: 50%;">Key Features</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Home</strong></td>
+          <td><code>/</code></td>
+          <td>All</td>
+          <td>Hero showcase, category ribbons, featured items carousel.</td>
+        </tr>
+        <tr>
+          <td><strong>Catalog</strong></td>
+          <td><code>/products</code></td>
+          <td>All</td>
+          <td>Search, price filter, category pills, rating sort, grid view.</td>
+        </tr>
+        <tr>
+          <td><strong>Product Detail</strong></td>
+          <td><code>/products/:id</code></td>
+          <td>All</td>
+          <td>Stock counters, reviews list, quantity selector, specs sheet.</td>
+        </tr>
+        <tr>
+          <td><strong>Shopping Cart</strong></td>
+          <td><code>/cart</code></td>
+          <td>All</td>
+          <td>Item removal, quantity controls, promo code <code>NEXURA10</code>.</td>
+        </tr>
+        <tr>
+          <td><strong>Checkout</strong></td>
+          <td><code>/checkout</code></td>
+          <td>Customer</td>
+          <td>Address validation, payment method selector, order summary.</td>
+        </tr>
+        <tr>
+          <td><strong>Order Tracker</strong></td>
+          <td><code>/orders/:id</code></td>
+          <td>Customer / Admin</td>
+          <td>4-stage animated progress bar, downloadable invoice breakdown.</td>
+        </tr>
+        <tr>
+          <td><strong>Admin Dashboard</strong></td>
+          <td><code>/admin</code></td>
+          <td>Admin</td>
+          <td>Revenue KPIs, product management modal, order fulfillment controls.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h1>6. Operations & Demo Credentials</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Email Address</th>
+          <th>Password</th>
+          <th>Permissions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Administrator</strong></td>
+          <td><code>admin@ecommerce.com</code></td>
+          <td><code>Admin@123</code></td>
+          <td>Full access to Admin Dashboard, Product CRUD, Order Fulfillment</td>
+        </tr>
+        <tr>
+          <td><strong>Customer</strong></td>
+          <td><code>customer@ecommerce.com</code></td>
+          <td><code>Customer@123</code></td>
+          <td>Browsing, Cart, Checkout, Order Tracking, Profile Management</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Standard Startup Commands</h3>
+    <div class="ascii-diagram">
+# 1. Initialize databases and seed initial demo data
+npm run init:db
+
+# 2. Start all microservices and frontend concurrently
+npm start
+
+# Access URLs:
+# - Frontend Application:    http://localhost:5173
+# - User Service API:        http://localhost:5001/api
+# - Order Service API:       http://localhost:5002/api
+    </div>
+
+    <div class="footer-bar">
+      <span>Nexura Technical Specification • Operations & Deployment</span>
+      <span>Page 4 of 4</span>
+    </div>
+  </div>
+
+</body>
+</html>

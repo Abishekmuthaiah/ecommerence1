@@ -12,6 +12,8 @@ import {
   User,
   Phone,
   Mail,
+  XCircle,
+  AlertTriangle,
 } from 'lucide-react';
 import { orderService } from '../services/orderService';
 
@@ -19,6 +21,9 @@ export default function OrderDetailsPage() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
     async function loadOrder() {
@@ -36,6 +41,24 @@ export default function OrderDetailsPage() {
     }
     loadOrder();
   }, [id]);
+
+  const handleCancelOrder = async () => {
+    if (!order?.id) return;
+    try {
+      setCancelling(true);
+      const res = await orderService.cancelOrder(order.id);
+      if (res.success) {
+        setOrder(res.order);
+        setShowCancelModal(false);
+        setToastMessage('Order has been cancelled and refunded successfully.');
+      }
+    } catch (err) {
+      console.error('Error cancelling order:', err);
+      alert(err.response?.data?.message || 'Failed to cancel order');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -57,6 +80,9 @@ export default function OrderDetailsPage() {
       </div>
     );
   }
+
+  const isCancelled = order.order_status === 'Cancelled';
+  const canCancel = !isCancelled && order.order_status !== 'Delivered';
 
   const steps = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered'];
   const currentStepIndex = steps.indexOf(order.order_status);
@@ -85,14 +111,43 @@ export default function OrderDetailsPage() {
               Placed on {new Date(order.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
-          <span className="badge badge-indigo" style={{ fontSize: '0.85rem', padding: '0.4rem 1rem' }}>
-            Status: {order.order_status}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span className={isCancelled ? "badge badge-rose" : "badge badge-indigo"} style={{ fontSize: '0.85rem', padding: '0.4rem 1rem' }}>
+              Status: {order.order_status}
+            </span>
+            {canCancel && (
+              <button
+                onClick={() => setShowCancelModal(true)}
+                className="btn btn-danger btn-sm"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                <XCircle size={16} /> Cancel Order
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
+      {toastMessage && (
+        <div style={{
+          background: 'rgba(225, 29, 72, 0.1)',
+          border: '1px solid rgba(225, 29, 72, 0.3)',
+          borderRadius: 'var(--radius-md)',
+          padding: '1rem 1.25rem',
+          color: 'var(--accent-rose)',
+          fontSize: '0.95rem',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.65rem',
+        }}>
+          <CheckCircle2 size={20} />
+          {toastMessage}
+        </div>
+      )}
+
       {/* Progress Tracker Card */}
-      {order.order_status !== 'Cancelled' && (
+      {!isCancelled ? (
         <div className="card" style={{ padding: '2rem' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-primary)' }}>
             Fulfillment Progress
@@ -129,6 +184,20 @@ export default function OrderDetailsPage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      ) : (
+        <div className="card" style={{ padding: '1.75rem', background: 'rgba(225, 29, 72, 0.05)', border: '1px solid rgba(225, 29, 72, 0.2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(225, 29, 72, 0.15)', color: 'var(--accent-rose)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <XCircle size={28} />
+            </div>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--accent-rose)' }}>This Order is Cancelled</h3>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.2rem' }}>
+                Stock has been returned to inventory and payment has been processed for refund ({order.payment_status}).
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -245,7 +314,7 @@ export default function OrderDetailsPage() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>Payment Status</span>
-                <span className={order.payment_status === 'Paid' ? 'badge badge-emerald' : 'badge badge-amber'}>
+                <span className={order.payment_status === 'Paid' ? 'badge badge-emerald' : order.payment_status === 'Refunded' ? 'badge badge-rose' : 'badge badge-amber'}>
                   {order.payment_status}
                 </span>
               </div>
@@ -253,6 +322,56 @@ export default function OrderDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Cancel Order Confirmation Modal */}
+      {showCancelModal && (
+        <div className="modal-backdrop" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem',
+        }}>
+          <div className="card" style={{ maxWidth: '450px', width: '100%', padding: '2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(225, 29, 72, 0.15)', color: 'var(--accent-rose)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+              <AlertTriangle size={32} />
+            </div>
+
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)' }}>Cancel Order #{order.id}?</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+              Are you sure you want to cancel this order? All items will be restored to inventory and payment will be refunded.
+            </p>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(false)}
+                className="btn btn-secondary"
+                style={{ flex: 1 }}
+                disabled={cancelling}
+              >
+                Keep Order
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelOrder}
+                className="btn btn-danger"
+                style={{ flex: 1 }}
+                disabled={cancelling}
+              >
+                {cancelling ? 'Cancelling...' : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

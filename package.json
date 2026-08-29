@@ -1,14 +1,13 @@
 {
   "name": "nexura-commerce-platform",
   "version": "1.0.0",
-  "description": "Nexura - Flagship Full-Stack E-Commerce Platform with React and Node.js Microservices",
+  "description": "Nexura - Flagship Full-Stack E-Commerce Platform with React and Spring Boot 3 Microservices",
   "scripts": {
-    "init:db": "node database/init_db.js",
-    "start:user-service": "cd user-product-service && npm start",
-    "start:order-service": "cd order-cart-service && npm start",
+    "start:user-service": "java -jar user-product-service/target/user-product-service-1.0.0.jar",
+    "start:order-service": "java -jar order-cart-service/target/order-cart-service-1.0.0.jar",
     "start:frontend": "cd frontend && npm run dev",
-    "install:all": "npm install && cd user-product-service && npm install && cd ../order-cart-service && npm install && cd ../frontend && npm install",
-    "start": "concurrently \"npm run start:user-service\" \"npm run start:order-service\" \"npm run start:frontend\""
+    "build:backend": "\"apache-maven-3.9.6/bin/mvn\" clean package -DskipTests",
+    "start": "concurrently --kill-others-on-fail \"npm run start:user-service\" \"npm run start:order-service\" \"npm run start:frontend\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Star, Eye } from 'lucide-react';
+import { ShoppingBag, Star, Eye, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const [isAdded, setIsAdded] = useState(false);
 
   const isDiscounted = product.discount_price && parseFloat(product.discount_price) < parseFloat(product.price);
   const currentPrice = isDiscounted ? parseFloat(product.discount_price) : parseFloat(product.price);
@@ -19,8 +20,10 @@ export default function ProductCard({ product }) {
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!isOutOfStock) {
+    if (!isOutOfStock && !isAdded) {
       addToCart(product, 1);
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 1400);
     }
   };
 
@@ -79,12 +82,34 @@ export default function ProductCard({ product }) {
           zIndex: 2,
         }}>
           {isDiscounted && (
-            <span className="badge badge-rose" style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem' }}>
+            <span
+              className="badge"
+              style={{
+                fontSize: '0.7rem',
+                padding: '0.25rem 0.65rem',
+                background: 'rgba(255, 59, 48, 0.92)',
+                color: '#FFFFFF',
+                fontWeight: 700,
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+              }}
+            >
               Save {discountPercent}%
             </span>
           )}
           {product.is_featured && (
-            <span className="badge badge-indigo" style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem' }}>
+            <span
+              className="badge"
+              style={{
+                fontSize: '0.7rem',
+                padding: '0.25rem 0.65rem',
+                background: 'rgba(0, 113, 227, 0.92)',
+                color: '#FFFFFF',
+                fontWeight: 700,
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+              }}
+            >
               Featured
             </span>
           )}
@@ -154,34 +179,76 @@ export default function ProductCard({ product }) {
           <span style={{ color: 'var(--text-muted)' }}>({product.num_reviews || 24})</span>
         </div>
 
-        {/* Price & Action Row */}
+        {/* Price & Action Section */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           marginTop: 'auto',
           paddingTop: '0.85rem',
           borderTop: '1px solid var(--border-subtle)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.65rem',
         }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.4rem' }}>
-            <span style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-heading)' }}>
-              ₹{currentPrice.toFixed(2)}
-            </span>
+          <div style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            gap: '0.5rem',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.45rem', flexWrap: 'wrap' }}>
+              <span style={{
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                fontFamily: 'var(--font-heading)',
+                letterSpacing: '-0.02em',
+              }}>
+                ₹{Number(currentPrice).toLocaleString('en-IN')}
+              </span>
+              {isDiscounted && (
+                <span style={{ fontSize: '0.825rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                  ₹{Number(originalPrice).toLocaleString('en-IN')}
+                </span>
+              )}
+            </div>
             {isDiscounted && (
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
-                ₹{originalPrice.toFixed(2)}
+              <span className="badge badge-rose" style={{ fontSize: '0.68rem', padding: '0.15rem 0.45rem', fontWeight: 700 }}>
+                {discountPercent}% OFF
               </span>
             )}
           </div>
 
           <button
             onClick={handleAddToCart}
-            disabled={isOutOfStock}
-            className={`btn ${isOutOfStock ? 'btn-secondary' : 'btn-primary'} btn-sm`}
-            style={{ padding: '0.4rem 0.95rem' }}
+            disabled={isOutOfStock || isAdded}
+            className={`btn ${isOutOfStock ? 'btn-secondary' : 'btn-primary'}`}
+            style={{
+              width: '100%',
+              padding: '0.55rem 1rem',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              gap: '0.45rem',
+              borderRadius: 'var(--radius-full)',
+              background: isAdded ? 'var(--accent-emerald)' : undefined,
+              borderColor: isAdded ? 'var(--accent-emerald)' : undefined,
+              color: '#FFFFFF',
+              boxShadow: isOutOfStock ? 'none' : isAdded ? '0 2px 10px rgba(52, 199, 89, 0.3)' : '0 2px 8px rgba(0, 113, 227, 0.25)',
+              cursor: isOutOfStock ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
           >
-            <ShoppingBag size={14} />
-            {isOutOfStock ? 'Sold' : 'Add to Bag'}
+            {isOutOfStock ? (
+              <span>Out of Stock</span>
+            ) : isAdded ? (
+              <>
+                <Check size={16} />
+                <span>Added to Bag</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag size={15} />
+                <span>Add to Bag</span>
+              </>
+            )}
           </button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Calendar, Clock, ChevronRight, AlertCircle, ShoppingBag } from 'lucide-react';
+import { Package, Calendar, Clock, ChevronRight, AlertCircle, ShoppingBag, XCircle, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { orderService } from '../services/orderService';
 import EmptyState from '../components/EmptyState';
@@ -9,6 +9,9 @@ export default function MyOrdersPage() {
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cancelOrderId, setCancelOrderId] = useState(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
     async function loadOrders() {
@@ -28,6 +31,25 @@ export default function MyOrdersPage() {
     }
     loadOrders();
   }, [user]);
+
+  const handleCancelOrder = async () => {
+    if (!cancelOrderId) return;
+    try {
+      setCancelling(true);
+      const res = await orderService.cancelOrder(cancelOrderId);
+      if (res.success) {
+        setOrders(orders.map((o) => (o.id === cancelOrderId ? res.order : o)));
+        setToastMessage(`Order #${cancelOrderId} cancelled and refunded successfully.`);
+        setCancelOrderId(null);
+        setTimeout(() => setToastMessage(null), 5000);
+      }
+    } catch (err) {
+      console.error('Error cancelling order:', err);
+      alert(err.response?.data?.message || 'Failed to cancel order');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -50,9 +72,27 @@ export default function MyOrdersPage() {
       <div>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-primary)' }}>My Orders</h1>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-          Track and view invoices for all your recent orders.
+          Track, manage, and view invoices for all your orders.
         </p>
       </div>
+
+      {toastMessage && (
+        <div style={{
+          background: 'rgba(225, 29, 72, 0.1)',
+          border: '1px solid rgba(225, 29, 72, 0.3)',
+          borderRadius: 'var(--radius-md)',
+          padding: '1rem 1.25rem',
+          color: 'var(--accent-rose)',
+          fontSize: '0.95rem',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.65rem',
+        }}>
+          <CheckCircle2 size={20} />
+          {toastMessage}
+        </div>
+      )}
 
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -76,6 +116,7 @@ export default function MyOrdersPage() {
               month: 'short',
               day: 'numeric',
             });
+            const isCancellable = order.order_status !== 'Cancelled' && order.order_status !== 'Delivered';
 
             return (
               <div
@@ -152,17 +193,78 @@ export default function MyOrdersPage() {
                     ))}
                   </div>
 
-                  <Link
-                    to={`/my-orders/${order.id}`}
-                    className="btn btn-secondary btn-sm"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                  >
-                    View Details <ChevronRight size={16} />
-                  </Link>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    {isCancellable && (
+                      <button
+                        onClick={() => setCancelOrderId(order.id)}
+                        className="btn btn-danger btn-sm"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                      >
+                        <XCircle size={15} /> Cancel Order
+                      </button>
+                    )}
+                    <Link
+                      to={`/my-orders/${order.id}`}
+                      className="btn btn-secondary btn-sm"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                    >
+                      View Details <ChevronRight size={16} />
+                    </Link>
+                  </div>
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Cancel Order Confirmation Modal */}
+      {cancelOrderId && (
+        <div className="modal-backdrop" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.7)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem',
+        }}>
+          <div className="card" style={{ maxWidth: '450px', width: '100%', padding: '2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(225, 29, 72, 0.15)', color: 'var(--accent-rose)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
+              <AlertTriangle size={32} />
+            </div>
+
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)' }}>Cancel Order #{cancelOrderId}?</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+              Are you sure you want to cancel this order? All items will be restored to live stock and your payment will be refunded.
+            </p>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setCancelOrderId(null)}
+                className="btn btn-secondary"
+                style={{ flex: 1 }}
+                disabled={cancelling}
+              >
+                Keep Order
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelOrder}
+                className="btn btn-danger"
+                style={{ flex: 1 }}
+                disabled={cancelling}
+              >
+                {cancelling ? 'Cancelling...' : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

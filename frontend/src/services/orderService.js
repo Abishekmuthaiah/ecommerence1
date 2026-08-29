@@ -36,4 +36,10 @@ export const orderService = {
     const res = await orderCartApi.get('/orders/stats/summary');
     return res.data;
   },
+
+  // Cancel order (customer or admin)
+  cancelOrder: async (id) => {
+    const res = await orderCartApi.put(`/orders/${id}/cancel`);
+    return res.data;
+  },
 };
